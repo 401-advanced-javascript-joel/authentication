@@ -1,0 +1,38 @@
+{
+  "name": "authentication",
+  "version": "1.0.0",
+  "description": "Lab 10: User authentication",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon -r dotenv/config index.js",
+    "lint": "eslint **/*.js",
+    "test": "jest --verbose --coverage --detectOpenHandles",
+    "test-watch": "jest --watchAll --verbose --coverage --detectOpenHandles"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/401-advanced-javascript-joel/authentication.git"
+  },
+  "author": "Joel Watson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/401-advanced-javascript-joel/authentication/issues"
+  },
+  "homepage": "https://github.com/401-advanced-javascript-joel/authentication#readme",
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "eslint": "^6.8.0",
+    "express-swagger-generator": "^1.1.17",
+    "jest": "^25.3.0",
+    "mongodb-memory-server": "^6.5.2",
+    "mongoose": "^5.9.9",
+    "morgan": "^1.10.0",
+    "supertest": "^4.0.2"
+  }
+}
