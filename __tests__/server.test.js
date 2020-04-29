@@ -26,13 +26,24 @@ describe('Testing Homepage & 404 Routes', () => {
 describe('Testing Signup Route', () => {
   test('Should load the created user', async () => {
     const res = await agent.post('/signup').send({
-      username: 'Jack',
-      password: 'JacksPass',
-      email: 'Jeff@email.com',
-      role: 'user',
+      username: 'Sam',
+      password: 'wize',
+      email: 'sam@email.com',
+      role: 'admin',
     });
     expect(res.status).toBe(200);
-    expect(JSON.parse(res.text).username).toBe('Jack');
+    expect(JSON.parse(res.text).user.username).toBe('Sam');
+  });
+
+  test('Should fail to create duplicate user', async () => {
+    const res = await agent.post('/signup').send({
+      username: 'Sam',
+      password: 'wize',
+      email: 'sam@email.com',
+      role: 'admin',
+    });
+    expect(res.status).toBe(400);
+    expect(res.text).toBe('<h2>Error 400:</h2><p>User already exists!</p>');
   });
 });
 
@@ -47,16 +58,50 @@ describe('Testing Users Route', () => {
 describe('Testing Signin Route', () => {
   test('Should load signin text', async () => {
     const res = await agent
-      .get('/signin')
+      .post('/signin')
       .send()
-      .set('authorization', 'Basic SmFjazpKYWNrc1Bhc3M=');
+      .set('authorization', 'Basic U2FtOndpemU=');
     expect(res.status).toBe(200);
-    expect(res.text).toBe('Signed In!');
+    expect(JSON.parse(res.text).user.username).toBe('Sam');
   });
 
   test('Should load 401 unauthorized text', async () => {
-    const res = await agent.get('/signin').send();
+    const res = await agent.post('/signin').send();
     expect(res.status).toBe(401);
-    expect(res.text).toBe('<h2>Error 401:</h2><p>Unauthorized access</p>');
+    expect(res.text).toBe(
+      '<h2>Error 401:</h2><p>Invalid credentials or token. Please sign in.</p>',
+    );
+  });
+});
+
+describe('Testing User Route', () => {
+  test('Should load signed in user data', async () => {
+    const response = await agent
+      .post('/signin')
+      .send()
+      .set('authorization', 'Basic U2FtOndpemU=');
+    const token = JSON.parse(response.text).token;
+    const res = await agent
+      .get('/user')
+      .send()
+      .set('authorization', 'Bearer ' + token);
+    expect(res.status).toBe(200);
+    expect(JSON.parse(res.text).username).toBe('Sam');
+  });
+
+  test('Should load signed in user data', async () => {
+    const response = await agent
+      .post('/signin')
+      .send()
+      .set('authorization', 'Basic U2FtOndpemU=');
+    const token = JSON.parse(response.text).token + 'A';
+    const res = await agent
+      .get('/user')
+      .send()
+      .set('authorization', 'Bearer ' + token);
+    expect(res.status).toBe(401);
+    expect(res.text).toBe(
+      '<h2>Error 401:</h2><p>Invalid credentials or token. Please sign in.</p>',
+    );
   });
 });
