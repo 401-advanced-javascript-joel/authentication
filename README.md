@@ -1,4 +1,4 @@
-# Lab 10 - Authentication
+# Lab 13 - Authentication
 
 This is a simple express server that implements user authentication.
 
@@ -27,8 +27,4 @@ This is a simple express server that implements user authentication.
 
 ### UML
 
-Lab 10 & 13 (same basic layout)
-
-Lab 14
-
-![UML 10](https://drive.google.com/uc?export=view&id=1ayxgnSUl4fqUmLjhfuvS6wRBzFsGJog6)
+![UML](https://raw.githubusercontent.com/401-advanced-javascript-joel/authentication/lab-14/assets/lab-14-uml.jpg)
