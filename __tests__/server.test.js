@@ -5,7 +5,37 @@ const mockDB = require('../data/mock-db');
 const { server } = require('../lib/server');
 const agent = request(server);
 
-beforeAll(async () => await mockDB.connectMock());
+// roles
+let user;
+let editor;
+let admin;
+
+beforeAll(async () => {
+  await mockDB.connectMock();
+  user = await agent.post('/signup').send({
+    username: 'user',
+    password: 'user',
+    email: 'user@email.com',
+    role: 'user',
+  });
+  user = JSON.parse(user.text);
+
+  editor = await agent.post('/signup').send({
+    username: 'editor',
+    password: 'editor',
+    email: 'editor@email.com',
+    role: 'editor',
+  });
+  editor = JSON.parse(editor.text);
+
+  admin = await agent.post('/signup').send({
+    username: 'admin',
+    password: 'admin',
+    email: 'admin@email.com',
+    role: 'admin',
+  });
+  admin = JSON.parse(admin.text);
+});
 
 afterAll(async () => await mockDB.closeMock());
 
@@ -51,7 +81,7 @@ describe('Testing Users Route', () => {
   test('Should load list of users', async () => {
     const res = await agent.get('/users').send();
     expect(res.status).toBe(200);
-    expect(JSON.parse(res.text).length).toBe(1);
+    expect(JSON.parse(res.text).length).toBe(4); // 3 roles users plus 1 above.
   });
 });
 
@@ -103,5 +133,79 @@ describe('Testing User Route', () => {
     expect(res.text).toBe(
       '<h2>Error 401:</h2><p>Invalid credentials or token. Please sign in.</p>',
     );
+  });
+});
+
+describe('Testing Public Route', () => {
+  test('Should load for all users', async () => {
+    const res = await agent.get('/public').send();
+    expect(res.status).toBe(200);
+    expect(res.text).toBe('This is a public page');
+  });
+});
+
+describe('Testing Private Route', () => {
+  test('Should load for signed in users', async () => {
+    const res = await agent
+      .get('/private')
+      .send()
+      .set('authorization', 'Bearer ' + user.token);
+    expect(res.status).toBe(200);
+    expect(res.text).toBe('This is a private page');
+  });
+});
+
+describe('Testing Readonly Route', () => {
+  test('Should load for user role or above', async () => {
+    const res = await agent
+      .get('/readonly')
+      .send()
+      .set('authorization', 'Bearer ' + user.token);
+    expect(res.status).toBe(200);
+    expect(res.text).toBe('You can read this content');
+  });
+});
+
+describe('Testing Create Route', () => {
+  test('Should load for editor role or above', async () => {
+    const res = await agent
+      .post('/create')
+      .send()
+      .set('authorization', 'Bearer ' + editor.token);
+    expect(res.status).toBe(200);
+    expect(res.text).toBe('You can create content');
+  });
+});
+
+describe('Testing Update Route', () => {
+  test('Should load for editor role or above', async () => {
+    const res = await agent
+      .put('/update')
+      .send()
+      .set('authorization', 'Bearer ' + editor.token);
+    expect(res.status).toBe(200);
+    expect(res.text).toBe('You can update content');
+  });
+});
+
+describe('Testing Delete Route', () => {
+  test('Should load for admin role', async () => {
+    const res = await agent
+      .delete('/delete')
+      .send()
+      .set('authorization', 'Bearer ' + admin.token);
+    expect(res.status).toBe(200);
+    expect(res.text).toBe('You can delete content');
+  });
+});
+
+describe('Testing Everything Route', () => {
+  test('Should load for admin role', async () => {
+    const res = await agent
+      .get('/everything')
+      .send()
+      .set('authorization', 'Bearer ' + admin.token);
+    expect(res.status).toBe(200);
+    expect(res.text).toBe('You’re a super user!');
   });
 });
