@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/401-advanced-javascript-joel/authentication#readme",
   "dependencies": {
-    "bcrypt": "^4.0.1",
+    "bcrypt": "^5.0.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
